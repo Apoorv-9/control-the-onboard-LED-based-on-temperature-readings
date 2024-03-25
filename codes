@@ -1,0 +1,55 @@
+#include <Arduino.h>
+
+// Define constants
+const int sensorPin = A0;    // LM35 sensor pin connected to analog pin A0
+const int ledPin = 13;       // Arduino onboard LED pin
+
+// Define variables
+unsigned long previousMillis = 0;
+int interval = 250;          // Blink interval when temperature is below 30°C
+int ledState = LOW;          // Initialize LED state
+
+void setup() {
+  pinMode(ledPin, OUTPUT);   // Set the LED pin as output
+}
+
+void loop() {
+  // Read temperature from LM35 sensor
+  int temperature = readTemperature();
+
+  // Check temperature conditions and control LED blink
+  if (temperature < 30) {
+    interval = 250;   // Set blink interval to 250ms
+  } else {
+    interval = 500;   // Set blink interval to 500ms
+  }
+
+  unsigned long currentMillis = millis();  // Get the current time
+
+  // Check if it's time to blink the LED
+  if (currentMillis - previousMillis >= interval) {
+    // Save the last time the LED blinked
+    previousMillis = currentMillis;
+
+    // If the LED is off, turn it on. If it's on, turn it off.
+    if (ledState == LOW) {
+      ledState = HIGH;
+    } else {
+      ledState = LOW;
+    }
+
+    // Set the LED with the ledState value
+    digitalWrite(ledPin, ledState);
+  }
+}
+
+// Function to read temperature from LM35 sensor
+int readTemperature() {
+  // Read the raw value from the sensor
+  int sensorValue = analogRead(sensorPin);
+
+  // Convert the analog reading to temperature in Celsius
+  float temperature = (sensorValue * 5.0 / 1024) * 100;
+
+  return temperature;
+}
